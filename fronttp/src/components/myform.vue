@@ -1,24 +1,28 @@
 <template>
   <div>
   <fieldset>
-    <legend>Sign in</legend>
+    <legend>Merci de renseigner vos login GLPI</legend>
 
     <div>
-        <label for="userName">Username:</label>
+        <label for="userName">Utilisateur :</label>
         <input ref="user" type="text" id="username" name="username"
                required />
     </div>
 
     <div>
-        <label for="password">Password:</label>
+        <label for="password">Mot de passe :</label>
         <input  ref="password" type="password" id="password" name="password" />
     </div>
 
-    <button v-on:click="submit">submit</button>
+    <button v-on:click="submit">valider</button>
 
     </fieldset>
     <div>
-        <p>{{ result }}</p>
+      <ul>
+        <li v-for="item in result" :key="item">
+          {{ item.name }} {{ item.status }}
+        </li>
+      </ul>
     </div>
     </div>
 </template>
@@ -29,13 +33,12 @@ export default {
   name: 'myform',
   components: {},
   data:() => ({
-    result: ''
+    result: {}
   }),
   methods: {
-    submit()  {
+    async submit()  {
       fetch('http://localhost:3000/submit', {
         method:'POST',
-        //mode: 'cors',
         headers: {
           'Accept' : 'application/json',
           'Content-Type' : 'application/json'
@@ -44,10 +47,25 @@ export default {
           user : this.$refs.user.value,
           password : this.$refs.password.value
         })
-      }).then(async data => {
-        const res = await data.json()
-        this.result = res.test
-        });
+      }).then(async data =>{
+        this.result = await data.json();
+        var ended = false;
+        console.log(this.result.every(function(value, index) { return value.status === 'ended'}));
+        while (this.result.some(function(value, index) { return value.status !== 'ended'})) {
+          await fetch('http://localhost:3000/update', {
+            method:'POST',
+            headers: {
+              'Accept' : 'application/json',
+              'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify(
+              this.result
+            )
+          }).then(async data => {
+            this.result = await data.json();
+          });
+        }
+      });
     } 
   }
 }
