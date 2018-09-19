@@ -19,7 +19,7 @@
     </fieldset>
     <div>
       <ul>
-        <li v-for="item in result" :key="item">
+        <li v-for="item in result" :key=item.ID>
           {{ item.name }} {{ item.status }}
         </li>
       </ul>
@@ -50,7 +50,6 @@ export default {
       }).then(async data =>{
         this.result = await data.json();
         var ended = false;
-        console.log(this.result.every(function(value, index) { return value.status === 'ended'}));
         while (this.result.some(function(value, index) { return value.status !== 'ended'})) {
           await fetch('http://localhost:3000/update', {
             method:'POST',
