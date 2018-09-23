@@ -2,7 +2,6 @@
   <div>
   <fieldset>
     <legend>Merci de renseigner vos login GLPI</legend>
-
     <div>
         <label for="userName">Utilisateur :</label>
         <input ref="user" type="text" id="username" name="username"
@@ -20,18 +19,21 @@
     <div>
       <ul>
         <li v-for="item in result" :key=item.ID>
-          {{ item.name }} {{ item.status }}
+          {{ item.name }} {{ item.status }}  <a v-if="item.status != 'ended'"> <circle-spin></circle-spin> </a> <a v-else> <font-awesome-icon icon="check-circle" /> </a>
         </li>
       </ul>
     </div>
+    
     </div>
 </template>
 
 <script>
-
+import CircleSpin from '../../node_modules/vue-loading-spinner/src/components/Circle'
 export default {
   name: 'myform',
-  components: {},
+  components: {
+    CircleSpin
+  },
   data:() => ({
     result: {}
   }),
@@ -49,8 +51,7 @@ export default {
         })
       }).then(async data =>{
         this.result = await data.json();
-        var ended = false;
-        while (this.result.some(function(value, index) { return value.status !== 'ended'})) {
+        while (this.result.some(function(value) { return value.status !== 'ended'})) {
           await fetch('http://localhost:3000/update', {
             method:'POST',
             headers: {
