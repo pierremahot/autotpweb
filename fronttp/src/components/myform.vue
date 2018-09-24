@@ -65,8 +65,6 @@
           const myjson = await data.json();
           this.result = myjson.files;
           this.idrequest = myjson.idrequest;
-          console.log(this.result);
-          console.log(this.idrequest);
           while (this.result.some(function(value) {
               return value.status !== 'ended'
             })) {
