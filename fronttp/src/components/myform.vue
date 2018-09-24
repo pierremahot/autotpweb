@@ -19,7 +19,19 @@
     <div>
       <ul>
         <li v-for="item in result" :key=item.ID>
-          {{ item.name }} {{ item.status }}  <a v-if="item.status != 'ended'"> <circle-spin></circle-spin> </a> <a v-else> <font-awesome-icon icon="check-circle" /> </a>
+          {{ item.name }} {{ item.status }}  
+          <a v-if="item.status != 'ended'">
+            <circle-spin></circle-spin> 
+          </a>
+          <a v-else>
+            <font-awesome-icon class="ok" icon="check-circle" />
+            <font-awesome-icon v-if="item.folded == true" v-on:click="item.folded=false" icon="caret-right" />
+            <font-awesome-icon v-if="item.folded == false" v-on:click="item.folded=true" icon="caret-down" />
+            <ul v-if="item.folded == false" v-for="tp in item.result" :key=tp.id>
+              <li>{{ tp.id }} : {{ tp.state }}  </li>
+            </ul>
+          </a>
+
         </li>
       </ul>
     </div>
@@ -35,7 +47,8 @@ export default {
     CircleSpin
   },
   data:() => ({
-    result: {}
+    result: {},
+    idrequest:''
   }),
   methods: {
     async submit()  {
@@ -50,7 +63,11 @@ export default {
           password : this.$refs.password.value
         })
       }).then(async data =>{
-        this.result = await data.json();
+        const myjson = await data.json();
+        this.result= myjson.files;
+        this.idrequest = myjson.idrequest;
+        console.log(this.result);
+        console.log(this.idrequest);
         while (this.result.some(function(value) { return value.status !== 'ended'})) {
           await fetch('http://localhost:3000/update', {
             method:'POST',
@@ -58,9 +75,10 @@ export default {
               'Accept' : 'application/json',
               'Content-Type' : 'application/json'
             },
-            body: JSON.stringify(
-              this.result
-            )
+            body: JSON.stringify({
+              idrequest: this.idrequest,
+              files: this.result
+            })
           }).then(async data => {
             this.result = await data.json();
           });
@@ -71,3 +89,21 @@ export default {
 }
 
 </script>
+<style>
+.ok{
+  display: inline-block;
+  font-style: normal;
+  color: green;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+}
+.warn{
+  display: inline-block;
+  font-style: normal;
+  color: red;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+}
+</style>
