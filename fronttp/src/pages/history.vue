@@ -7,7 +7,7 @@
             <li v-for="item in result" :key=item.idrequest>
                 requete : {{ item.idrequest }}
                 <ul v-for="file in item.files" :key=file.id>
-                        <li>ID : {{ file.id }}, nom du fichier : {{file.name}}, status : {{ file.status }} </li>
+                        <li>ID : {{ file.id }}, nom du fichier : {{file.name}}, status : {{ file.status }} <font-awesome-icon v-if="file.status=='ended'" class="ok" icon="check-circle" /></li>
                 </ul>    
             </li>
         </ul>

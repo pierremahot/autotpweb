@@ -36,7 +36,7 @@ new Vue({
   },
   computed: {
     ViewComponent () {
-      return routes[this.currentRoute] || NotFound
+      return routes[this.currentRoute] || page404
     }
   },
   render (h) { return h(this.ViewComponent) }

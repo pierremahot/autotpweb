@@ -1,8 +1,9 @@
 <template>
-  <main-layout>
+  <div>
     <top/>
-    <p>Page not found</p>
-  </main-layout>
+    <p>
+      <h2>Page not found</h2>
+  </div>
 </template>
 
 <script>
