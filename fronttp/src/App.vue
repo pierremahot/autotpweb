@@ -1,30 +1,16 @@
 <template>
   <div>
-    <dropzone/>
-    <myform/>
+    <h1> Bienvenu sur le site d'automatisation des TP</h1>
+    <ul>
+     <li><a href="/tpimport">Importer des TP</a></li>
+     <li><a href="/404">404</a></li>
+     <li><a href="/history">history</a></li>
+    </ul>
   </div>
 </template>
 
 <script>
-  import dropzone from './components/dropzone.vue'
-  import myform from './components/myform.vue'
-  
-  export default {
-    name: 'app',
-    components: {
-      dropzone,
-      myform
-    }
-  }
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
 </style>

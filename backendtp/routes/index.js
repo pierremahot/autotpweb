@@ -64,6 +64,10 @@ router.post('/update', async function (req, res) {
   res.send(tableau[idrequest].files);
 });
 
+router.get('/history', function (req, res) {
+  res.send(tableau);
+});
+
 function parsing(idrequest) {
   return new Promise(async resolve => {
     tableau[idrequest].files.forEach(async element => {
@@ -78,7 +82,7 @@ function parsing(idrequest) {
             }
           });
           element.status = 'running';
-          await sleep(5000);
+          await sleep(getRandomInt(5000));
           fs.rename('/tmp/tp/running/' + element.name, '/tmp/tp/done/' + element.name, (err) => {
             if (err) {
               console.log(err);
@@ -101,6 +105,10 @@ function parsing(idrequest) {
     return resolve = 1;
   });
 };
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
