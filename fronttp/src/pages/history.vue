@@ -2,7 +2,7 @@
     <div>
         <top/>
         <h1> History </h1>
-        <button v-on:click="get">get history</button>
+        <button v-on:click="get">update history</button>
         <ul>
             <li v-for="item in result" :key=item.idrequest>
                 requete : {{ item.idrequest }}
@@ -21,10 +21,12 @@
         components: {
             top
         },
-        data: () => ({
-            result: {},
-            idrequest: ''
-        }),
+        created: function() {
+            this.get();
+        },
+        data: () => (
+            { result: {} }
+        ),
         methods: {
             async get() {
                 fetch('http://localhost:3000/history', {
