@@ -23,11 +23,12 @@
             <circle-spin></circle-spin>
           </a>
           <a v-else>
-            <font-awesome-icon class="ok" icon="check-circle" />
+            <font-awesome-icon v-if="item.error == 0" class="ok" icon="check-circle" />
+            <font-awesome-icon v-else class="warn" icon="exclamation-circle" />
             <font-awesome-icon v-if="item.folded == true" v-on:click="item.folded=false" icon="caret-right" />
             <font-awesome-icon v-if="item.folded == false" v-on:click="item.folded=true" icon="caret-down" />
             <ul v-if="item.folded == false" v-for="tp in item.result" :key=tp.id>
-              <li>{{ tp.id }} : {{ tp.state }} </li>
+              <li><a :href="tp.url">{{ tp.name }}</a><font-awesome-icon v-if="tp.error == 0" class="ok" icon="check-circle" /><font-awesome-icon v-else class="warn" icon="exclamation-circle" /></li>
             </ul>
           </a>
   

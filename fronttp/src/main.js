@@ -12,13 +12,14 @@ import {
 import {
   faCheckCircle,
   faCaretRight,
-  faCaretDown
+  faCaretDown,
+  faExclamationCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   FontAwesomeIcon
 } from '@fortawesome/vue-fontawesome';
 
-library.add(faCheckCircle, faCaretRight, faCaretDown)
+library.add(faCheckCircle, faCaretRight, faCaretDown, faExclamationCircle)
 Vue.use(BootstrapVue);
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.config.productionTip = false

@@ -66,6 +66,7 @@ router.post('/update', async function (req, res) {
 
 router.get('/history', function (req, res) {
   res.send(tableau);
+  console.log(tableau);
 });
 
 function parsing(idrequest) {
@@ -91,12 +92,44 @@ function parsing(idrequest) {
             }
             element.status = 'ended';
             element.folded = false;
+            element.error = 0;
+            const now = new Date();
+            element.date = now.toString();
             element.result = [{
+              begindate:'02-05-2018',
+              enddate:'02-05-2018',
+              duration:'20min',
+              description:'description',
+              origine:'OBS',
+              type:'maintenance',
+              devices_list_folded: 'true',
+              devices_list: [{ entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
+              impact:'coupure totale',
+              error:'0',
+              response:'200',
               id: 1254,
-              state: 'success'
+              name: 'test1',
+              state: 'success',
+              url: 'http://',
+              error: 0,
+              folded: 'true'
             }, {
-              id: 12554,
-              state: 'success'
+              begindate:'02-05-2018',
+              enddate:'02-05-2018',
+              duration:'20min',
+              description:'description',
+              origine:'OBS',
+              type:'maintenance',
+              impact:'coupure totale',
+              devices_list_folded: 'true',
+              devices_list: [ { entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
+              response:'200',
+              id: 1255,
+              name: 'test2',
+              state: 'success',
+              url: 'http://',
+              error: 1,
+              folded: 'true'
             }];
           })
         }
