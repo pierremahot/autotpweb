@@ -1,5 +1,6 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
 const router = express.Router();
 const assert = require('assert');
@@ -29,140 +30,153 @@ router.post('/upload', function (req, res) {
   });
 
 });
+
+
+
+router.post('/update', async function (req, res) {
+  const idrequest = req.body.idrequest;
+  const files = req.body.files;
+  docs = await db.collection('requests').findOne({ '_id': ObjectID(idrequest)});
+  console.log(docs);
+  while (files.length > 0 &&
+    files.length === docs.files.length &&
+    files.sort().every(function (value, index) {
+      return _.isEqual(value, docs.files.sort()[index])
+    }) &&
+    files.sort().some(function (value) {
+      return value.status !== 'ended'
+    })
+  ){
+    docs = await db.collection('requests').findOne({ '_id': ObjectID(idrequest)});
+    console.log(docs);
+    await sleep(500);
+  }
+  res.send(docs.files);
+});
+
+router.get('/history', async function (req, res) {
+  docs = await db.collection('requests').find({ files: { $exists: true } });
+  console.log(docs);
+  res.send(docs);
+});
+
 router.post('/submit', function (req, res) {
-  console.log(req.body);
+  //console.log(req.body);
   var fs = require('fs');
   var files = fs.readdirSync('/tmp/tp/todo');
   //console.log(req.body.password);
   //res.redirect('http://localhost:8080');
   var idtp = 0;
-  var temp = [];
+  var files_list = [];
   files.forEach(element => {
-    temp.push({
+    files_list.push({
       id: idtp,
       name: element,
       status: 'todo'
     });
     idtp += 1;
   });
-  db.collection('requests').insertMany(temp).then( function (result){
-    console.log (result);                                                                                                                  
+  db.collection('requests').insertOne({'files': files_list}).then( function (result){
+    console.log (result.insertedId);
+    request = {
+      idrequest: result.insertedId,
+      files: files_list
+    };
+    res.send(request);
+    parsing(request.idrequest);
   });
-  tableau[idrequest] = ({
-    idrequest: idrequest,
-    files: temp
-  });
-  
-  console.log(tableau[idrequest]);
-  res.send(tableau[idrequest]);
-  parsing(idrequest);
-  idrequest += 1;
-});
-
-router.post('/update', async function (req, res) {
-  db.collection('documents').find({}).toArray(function(err, docs) {
-    assert.equal(err, null);
-    console.log("Found the following records");
-    console.log(docs);
-  });
-  const idrequest = req.body.idrequest;
-  const files = req.body.files;
-  console.log(files);
-  console.log(idrequest);
-  while (files.length > 0 &&
-    files.length === tableau[idrequest].files.length &&
-    files.sort().every(function (value, index) {
-      return _.isEqual(value, tableau[idrequest].files.sort()[index])
-    }) &&
-    files.sort().some(function (value) {
-      return value.status !== 'ended'
-    })
-  ) {
-    //console.log(req.body);
-    //console.log(tableau);
-    await sleep(500);
-  }
-  res.send(tableau[idrequest].files);
-});
-
-router.get('/history', function (req, res) {
-  res.send(tableau);
-  console.log(tableau);
 });
 
 function parsing(idrequest) {
+  //console.log(idrequest);
   return new Promise(async resolve => {
-    tableau[idrequest].files.forEach(async element => {
-      if (element.status != 'running') {
-        var fs = require('fs');
-        if (element.status == 'todo') {
-          fs.rename('/tmp/tp/todo/' + element.name, '/tmp/tp/running/' + element.name, (err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log('file moved to running');
-            }
-          });
-          element.status = 'running';
-          await sleep(getRandomInt(5000));
-          fs.rename('/tmp/tp/running/' + element.name, '/tmp/tp/done/' + element.name, (err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log('file moved to ended');
-            }
-            element.status = 'ended';
-            element.folded = false;
-            element.error = 0;
-            const now = new Date();
-            element.date = now.toString();
-            
-            element.result = [{
-              begindate:'02-05-2018',
-              enddate:'02-05-2018',
-              duration:'20min',
-              description:'description',
-              origine:'OBS',
-              type:'maintenance',
-              devices_list_folded: 'true',
-              devices_list: [{ entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
-              impact:'coupure totale',
-              error:'0',
-              response:'200',
-              id: 1254,
-              name: 'test1',
-              state: 'success',
-              url: 'http://',
-              error: 0,
-              folded: 'true'
-            }, {
-              begindate:'02-05-2018',
-              enddate:'02-05-2018',
-              duration:'20min',
-              description:'description',
-              origine:'OBS',
-              type:'maintenance',
-              impact:'coupure totale',
-              devices_list_folded: 'true',
-              devices_list: [ { entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
-              response:'200',
-              id: 1255,
-              name: 'test2',
-              state: 'success',
-              url: 'http://',
-              error: 1,
-              folded: 'true'
-            }];
-            
-          })
+    db.collection('requests').findOne({ '_id': ObjectID(idrequest) }).then( function (request){
+      request.files.every(async function (element, index) {
+        if (element.status != 'running') {
+          var fs = require('fs');
+          if (element.status == 'todo') {
+            fs.rename('/tmp/tp/todo/' + element.name, '/tmp/tp/running/' + element.name, (err) => {
+              if (err) {
+                //console.log(err);
+              } else {
+                //console.log('file moved to running');
+              }
+            });
+            var temp = request.files;
+            temp[index].status = 'running'
+            result = await db.collection('requests').findOneAndUpdate({ '_id': ObjectID(idrequest) },
+              { 
+                $set: {
+                  files: temp
+                }
+              }
+            );
+            console.log(result);
+            await sleep(getRandomInt(5000));
+            fs.rename('/tmp/tp/running/' + element.name, '/tmp/tp/done/' + element.name, async  (err) => {
+              if (err) {
+                console.log(err);
+              } else {
+                //console.log('file moved to ended');
+              }
+              temp[index] ={
+                status: 'ended',
+                folded: false,
+                error: 0,
+                result : [{
+                  begindate:'02-05-2018',
+                  enddate:'02-05-2018',
+                  duration:'20min',
+                  description:'description',
+                  origine:'OBS',
+                  type:'maintenance',
+                  devices_list_folded: 'true',
+                  devices_list: [{ entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
+                  impact:'coupure totale',
+                  error:'0',
+                  response:'200',
+                  id: 1254,
+                  name: 'test1',
+                  state: 'success',
+                  url: 'http://',
+                  error: 0,
+                  folded: 'true'
+                }, {
+                  begindate:'02-05-2018',
+                  enddate:'02-05-2018',
+                  duration:'20min',
+                  description:'description',
+                  origine:'OBS',
+                  type:'maintenance',
+                  impact:'coupure totale',
+                  devices_list_folded: 'true',
+                  devices_list: [ { entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
+                  response:'200',
+                  id: 1255,
+                  name: 'test2',
+                  state: 'success',
+                  url: 'http://',
+                  error: 1,
+                  folded: 'true'
+                }]
+              }
+              await db.collection('requests').findOneAndUpdate({ '_id': ObjectID(idrequest) },
+                { 
+                  $currentDate: {
+                    "creationDate": true
+                  },
+                  $set : {
+                    files: temp
+                  }
+                }
+              );
+            });
+          }
         }
-      }
+      });
+      return resolve = 1;
     });
-  
-    db.collection('documents').insertOne(tableau).then( function (result){
-      console.log (result);                                                                                                                  
-    });
-    return resolve = 1;
+    
   });
 };
 
