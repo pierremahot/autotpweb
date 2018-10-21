@@ -1,6 +1,18 @@
-var express = require('express');
-var _ = require('lodash');
-var router = express.Router();
+const express = require('express');
+const MongoClient = require('mongodb').MongoClient;
+const _ = require('lodash');
+const router = express.Router();
+const assert = require('assert');
+const url = 'mongodb://localhost:27017';
+const dbName = 'autotp';
+const client = new MongoClient(url, { useNewUrlParser: true });
+var db
+client.connect(function(err) {
+  assert.equal(null, err);
+  console.log("Connected successfully to server");
+  db = client.db(dbName);
+});
+
 var tableau = [];
 var idrequest = 0;
 router.post('/upload', function (req, res) {
@@ -33,10 +45,14 @@ router.post('/submit', function (req, res) {
     });
     idtp += 1;
   });
+  db.collection('requests').insertMany(temp).then( function (result){
+    console.log (result);                                                                                                                  
+  });
   tableau[idrequest] = ({
     idrequest: idrequest,
     files: temp
   });
+  
   console.log(tableau[idrequest]);
   res.send(tableau[idrequest]);
   parsing(idrequest);
@@ -44,6 +60,11 @@ router.post('/submit', function (req, res) {
 });
 
 router.post('/update', async function (req, res) {
+  db.collection('documents').find({}).toArray(function(err, docs) {
+    assert.equal(err, null);
+    console.log("Found the following records");
+    console.log(docs);
+  });
   const idrequest = req.body.idrequest;
   const files = req.body.files;
   console.log(files);
@@ -95,6 +116,7 @@ function parsing(idrequest) {
             element.error = 0;
             const now = new Date();
             element.date = now.toString();
+            
             element.result = [{
               begindate:'02-05-2018',
               enddate:'02-05-2018',
@@ -131,9 +153,14 @@ function parsing(idrequest) {
               error: 1,
               folded: 'true'
             }];
+            
           })
         }
       }
+    });
+  
+    db.collection('documents').insertOne(tableau).then( function (result){
+      console.log (result);                                                                                                                  
     });
     return resolve = 1;
   });

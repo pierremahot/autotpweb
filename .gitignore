@@ -1,0 +1,28 @@
+.DS_Store
+/backendtp/node_modules
+/fronttp/node_modules
+
+/fronttp/dist
+/backendtp/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+/fronttp/npm-debug.log*
+/fronttp/yarn-debug.log*
+/fronttp/yarn-error.log*
+
+/backendtp/npm-debug.log*
+/backendtp/yarn-debug.log*
+/backendtp/yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
