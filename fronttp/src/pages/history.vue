@@ -4,8 +4,8 @@
         <h1> History </h1>
         <button v-on:click="get">update history</button>
         <ul>
-            <li v-for="item in result" :key=item.idrequest>
-                requete : {{ item.idrequest }}
+            <li v-for="item in result" :key=item._id>
+                requete : {{ item._id }}
                 <ul v-for="file in item.files" :key=file.id>
                         <li>Date de saisie : {{ file.date }}</li>
                         <li>ID : {{ file.id }} </li>

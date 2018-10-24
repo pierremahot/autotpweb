@@ -55,17 +55,14 @@ router.post('/update', async function (req, res) {
 });
 
 router.get('/history', async function (req, res) {
-  docs = await db.collection('requests').find({ files: { $exists: true } });
+  docs = await db.collection('requests').find({ files: { $exists: true } }).toArray();
   console.log(docs);
   res.send(docs);
 });
 
 router.post('/submit', function (req, res) {
-  //console.log(req.body);
   var fs = require('fs');
   var files = fs.readdirSync('/tmp/tp/todo');
-  //console.log(req.body.password);
-  //res.redirect('http://localhost:8080');
   var idtp = 0;
   var files_list = [];
   files.forEach(element => {
@@ -103,6 +100,7 @@ function parsing(idrequest) {
               }
             });
             var temp = request.files;
+            console.log(temp);
             temp[index].status = 'running'
             result = await db.collection('requests').findOneAndUpdate({ '_id': ObjectID(idrequest) },
               { 
@@ -119,8 +117,12 @@ function parsing(idrequest) {
               } else {
                 //console.log('file moved to ended');
               }
+              const now = Date.now();
               temp[index] ={
                 status: 'ended',
+                id: element.id,
+                name: element.name,
+                date: now.getUTCDate(),
                 folded: false,
                 error: 0,
                 result : [{
