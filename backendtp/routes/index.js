@@ -117,12 +117,12 @@ function parsing(idrequest) {
               } else {
                 //console.log('file moved to ended');
               }
-              const now = Date.now();
+              const now = new Date();
               temp[index] ={
                 status: 'ended',
                 id: element.id,
                 name: element.name,
-                date: now.getUTCDate(),
+                date: now.toLocaleString(),
                 folded: false,
                 error: 0,
                 result : [{
