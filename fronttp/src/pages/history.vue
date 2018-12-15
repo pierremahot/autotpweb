@@ -4,13 +4,14 @@
         <h1> History </h1>
         <button v-on:click="get">update history</button>
         <ul>
-            <li v-for="item in result" :key=item._id>
+            <li v-for="item in visualizedata" :key=item._id>
                 requete : {{ item._id }}
                 <ul v-for="file in item.files" :key=file.id>
                         <li>Date de saisie : {{ file.date }}</li>
                         <li>ID : {{ file.id }} </li>
                         <li>Nom du fichier : {{file.name}}</li>
                         <li>Status : {{ file.status }} <font-awesome-icon v-if="file.error=='0'" class="ok" icon="check-circle" /><font-awesome-icon v-else class="warn" icon="exclamation-circle" /></li>
+                        <li>TP résultant :</li>
                         <ul v-for="tp in file.result" :key=tp.id>
                             <li>
                                 <a :href="tp.url">{{ tp.name }}</a>
@@ -58,7 +59,10 @@
             this.get();
         },
         data: () => (
-            { result: {} }
+            { 
+                result: {},
+                visualizedata: {}
+            }
         ),
         methods: {
             async get() {
@@ -70,6 +74,24 @@
                     },
                 }).then(async data => {
                     this.result = await data.json();
+                    let temp = await this.result;
+                    temp.forEach(request => {
+                        console.log(request);
+                        request.files.forEach(file => {
+                            if(this.visualizedata && this.visualizedata.file){
+                                file.result.forEach(tp => {
+                                    tp.folded = this.visualizedata.file.tp.folded;
+                                    tp.devices_list_folded = this.visualizedata.file.tp.devices_list_folded;
+                                });
+                            } else {
+                                file.result.forEach(tp => {
+                                    tp.folded = true;
+                                    tp.devices_list_folded = false;
+                                });
+                            }
+                        });
+                    });
+                    this.visualizedata = temp;
                 });
             }
         }

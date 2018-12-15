@@ -123,7 +123,6 @@ function parsing(idrequest) {
                 id: element.id,
                 name: element.name,
                 date: now.toLocaleString(),
-                folded: false,
                 error: 0,
                 result : [{
                   begindate:'02-05-2018',
@@ -132,17 +131,14 @@ function parsing(idrequest) {
                   description:'description',
                   origine:'OBS',
                   type:'maintenance',
-                  devices_list_folded: 'true',
                   devices_list: [{ entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
                   impact:'coupure totale',
-                  error:'0',
                   response:'200',
                   id: 1254,
                   name: 'test1',
                   state: 'success',
                   url: 'http://',
                   error: 0,
-                  folded: 'true'
                 }, {
                   begindate:'02-05-2018',
                   enddate:'02-05-2018',
@@ -151,7 +147,6 @@ function parsing(idrequest) {
                   origine:'OBS',
                   type:'maintenance',
                   impact:'coupure totale',
-                  devices_list_folded: 'true',
                   devices_list: [ { entry: 'monsite1' }, { entry: 'monsite2' }, { entry: 'monsite3' }],
                   response:'200',
                   id: 1255,
@@ -159,7 +154,6 @@ function parsing(idrequest) {
                   state: 'success',
                   url: 'http://',
                   error: 1,
-                  folded: 'true'
                 }]
               }
               await db.collection('requests').findOneAndUpdate({ '_id': ObjectID(idrequest) },

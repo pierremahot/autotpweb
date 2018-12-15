@@ -17,7 +17,7 @@
     </fieldset>
     <div>
       <ul>
-        <li v-for="item in result" :key=item.ID>
+        <li v-for="item in visualizedata" :key=item.ID>
           {{ item.name }} {{ item.status }}
           <a v-if="item.status != 'ended'">
             <circle-spin></circle-spin>
@@ -48,6 +48,7 @@
     },
     data: () => ({
       result: {},
+      visualizedata: {},
       idrequest: ''
     }),
     methods: {
@@ -81,6 +82,20 @@
               })
             }).then(async data => {
               this.result = await data.json();
+              let temp = this.result;
+              temp.forEach(file => {
+                if(this.visualizedata.file) {
+                  if(this.visualizedata.file.folded) {
+                    file.folded = this.visualizedata.file.folded;
+                  } else {
+                    file.folded = false;
+                  }
+                } else {
+                  file.folded = false;
+                }
+              });
+              console.log(temp);
+              this.visualizedata = temp;
             });
           }
         });
