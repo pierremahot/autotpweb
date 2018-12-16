@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <fieldset>
       <legend>Merci de renseigner vos login GLPI</legend>
       <div>
@@ -12,24 +12,27 @@
         <input ref="password" type="password" id="password" name="password" />
       </div>
   
-      <button v-on:click="submit">valider</button>
+      <b-btn v-on:click="submit" variant="primary">valider</b-btn>
   
     </fieldset>
     <div>
       <ul>
-        <li v-for="item in visualizedata" :key=item.ID>
-          {{ item.name }} {{ item.status }}
-          <a v-if="item.status != 'ended'">
+        <li v-for="file in visualizeTPRequest" :key=file.ID>
+          {{ file.name }} {{ file.status }}
+          <a v-if="file.status != 'ended'">
             <circle-spin></circle-spin>
           </a>
           <a v-else>
-            <font-awesome-icon v-if="item.error == 0" class="ok" icon="check-circle" />
+            <font-awesome-icon v-if="file.error == 0" class="ok" icon="check-circle" />
             <font-awesome-icon v-else class="warn" icon="exclamation-circle" />
-            <font-awesome-icon v-if="item.folded == true" v-on:click="item.folded=false" icon="caret-right" />
-            <font-awesome-icon v-if="item.folded == false" v-on:click="item.folded=true" icon="caret-down" />
-            <ul v-if="item.folded == false" v-for="tp in item.result" :key=tp.id>
-              <li><a :href="tp.url">{{ tp.name }}</a><font-awesome-icon v-if="tp.error == 0" class="ok" icon="check-circle" /><font-awesome-icon v-else class="warn" icon="exclamation-circle" /></li>
-            </ul>
+            <b-btn v-b-toggle="'info' + file.ID" class="btn btn-primary btn-sm btn btn-outline-info">detail</b-btn>
+            <b-collapse :id="'info' + file.ID" class="mt-2">
+              <b-card>
+                <ul v-for="tp in file.result" :key=tp.id>
+                  <li><a :href="tp.url">{{ tp.name }}</a><font-awesome-icon v-if="tp.error == 0" class="ok" icon="check-circle" /><font-awesome-icon v-else class="warn" icon="exclamation-circle" /></li>
+                </ul>
+              </b-card>
+            </b-collapse>
           </a>
   
         </li>
@@ -47,8 +50,8 @@
       CircleSpin
     },
     data: () => ({
-      result: {},
-      visualizedata: {},
+      TPRequest: {},
+      visualizeTPRequest: {},
       idrequest: ''
     }),
     methods: {
@@ -65,9 +68,9 @@
           })
         }).then(async data => {
           const myjson = await data.json();
-          this.result = myjson.files;
+          this.TPRequest = myjson.files;
           this.idrequest = myjson.idrequest;
-          while (this.result.some(function(value) {
+          while (this.TPRequest.some(function(value) {
               return value.status !== 'ended'
             })) {
             await fetch('http://localhost:3000/update', {
@@ -78,15 +81,15 @@
               },
               body: JSON.stringify({
                 idrequest: this.idrequest,
-                files: this.result
+                files: this.TPRequest
               })
             }).then(async data => {
-              this.result = await data.json();
-              let temp = this.result;
+              this.TPRequest = await data.json();
+              let temp = this.TPRequest;
               temp.forEach(file => {
-                if(this.visualizedata.file) {
-                  if(this.visualizedata.file.folded) {
-                    file.folded = this.visualizedata.file.folded;
+                if(this.visualizeTPRequest.file) {
+                  if(this.visualizeTPRequest.file.folded) {
+                    file.folded = this.visualizeTPRequest.file.folded;
                   } else {
                     file.folded = false;
                   }
@@ -94,8 +97,7 @@
                   file.folded = false;
                 }
               });
-              console.log(temp);
-              this.visualizedata = temp;
+              this.visualizeTPRequest = temp;
             });
           }
         });
