@@ -17,22 +17,15 @@
     </fieldset>
     <div>
       <ul>
-        <li v-for="file in visualizeTPRequest" :key=file.ID>
+        <li v-for="file in TPRequest" :key=file.ID>
           {{ file.name }} {{ file.status }}
           <a v-if="file.status != 'ended'">
             <circle-spin></circle-spin>
           </a>
           <a v-else>
-            <font-awesome-icon v-if="file.error == 0" class="ok" icon="check-circle" />
-            <font-awesome-icon v-else class="warn" icon="exclamation-circle" />
-            <b-btn v-b-toggle="'info' + file.ID" class="btn btn-primary btn-sm btn btn-outline-info">detail</b-btn>
-            <b-collapse :id="'info' + file.ID" class="mt-2">
-              <b-card>
-                <ul v-for="tp in file.result" :key=tp.id>
-                  <li><a :href="tp.url">{{ tp.name }}</a><font-awesome-icon v-if="tp.error == 0" class="ok" icon="check-circle" /><font-awesome-icon v-else class="warn" icon="exclamation-circle" /></li>
-                </ul>
-              </b-card>
-            </b-collapse>
+            <ul v-for="tp in file.result" :key=tp.id>
+              <displayTp v-bind:tp="tp" v-bind:file="file" v-bind:requestId="idrequest"></displayTp>
+            </ul>
           </a>
   
         </li>
@@ -44,14 +37,15 @@
 
 <script>
   import CircleSpin from '../../node_modules/vue-loading-spinner/src/components/Circle2'
+  import displayTp from '../components/tp.vue'
   export default {
     name: 'myform',
     components: {
-      CircleSpin
+      CircleSpin,
+      displayTp
     },
     data: () => ({
       TPRequest: {},
-      visualizeTPRequest: {},
       idrequest: ''
     }),
     methods: {
@@ -85,19 +79,6 @@
               })
             }).then(async data => {
               this.TPRequest = await data.json();
-              let temp = this.TPRequest;
-              temp.forEach(file => {
-                if(this.visualizeTPRequest.file) {
-                  if(this.visualizeTPRequest.file.folded) {
-                    file.folded = this.visualizeTPRequest.file.folded;
-                  } else {
-                    file.folded = false;
-                  }
-                } else {
-                  file.folded = false;
-                }
-              });
-              this.visualizeTPRequest = temp;
             });
           }
         });

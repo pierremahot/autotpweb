@@ -4,19 +4,19 @@
     <div class="container">
         <h1> History </h1>
         <b-btn v-on:click="get" variant="primary">update history</b-btn>
-        <tpdetail v-bind:history="result" ></tpdetail>
+        <displayHistoryTable v-bind:history="result" ></displayHistoryTable>
     </div>
   </div>
 </template>
 
 <script>
     import top from '../components/top.vue'
-    import tpdetail from '../components/tpdetail.vue'
+    import displayHistoryTable from '../components/table.vue'
     export default {
         name: 'myform',
         components: {
             top,
-            tpdetail
+            displayHistoryTable
         },
         created: function() {
             this.get();
