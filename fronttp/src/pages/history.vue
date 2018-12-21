@@ -26,7 +26,10 @@
         }),
         methods: {
             async get() {
-                fetch('http://localhost:3000/history', {
+                const url = new URL(this.$parent.$el.baseURI);
+                const params = new URLSearchParams(url.search);
+                console.log(params.get('ps'));
+                fetch('http://localhost:3000/history?ps=' + params.get('ps') + '&page=' + params.get('page'), {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',

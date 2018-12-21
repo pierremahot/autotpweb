@@ -1,19 +1,7 @@
 <template>
   <div class="container">
     <fieldset>
-      <legend>Merci de renseigner vos login GLPI</legend>
-      <div>
-        <label for="userName">Utilisateur :</label>
-        <input ref="user" type="text" id="username" name="username" required />
-      </div>
-  
-      <div>
-        <label for="password">Mot de passe :</label>
-        <input ref="password" type="password" id="password" name="password" />
-      </div>
-  
-      <b-btn v-on:click="submit" variant="primary">valider</b-btn>
-  
+      <b-btn v-on:click="submit" variant="primary">valider</b-btn>  
     </fieldset>
     <div>
       <ul>
@@ -57,8 +45,6 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            user: this.$refs.user.value,
-            password: this.$refs.password.value
           })
         }).then(async data => {
           const myjson = await data.json();

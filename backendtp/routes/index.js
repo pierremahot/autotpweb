@@ -55,8 +55,9 @@ router.post('/update', async function (req, res) {
 });
 
 router.get('/history', async function (req, res) {
-  docs = await db.collection('requests').find({ files: { $exists: true } }).toArray();
-  console.log(docs);
+  pagesize = (Number.isInteger(parseInt(req.query.ps)) ? parseInt(req.query.ps) : 1000);
+  page = (Number.isInteger(parseInt(req.query.ps)) ? parseInt(req.query.page) : 1);
+  docs = await db.collection('requests').find({ files: { $exists: true } }).skip(pagesize*(page-1)).limit(pagesize).toArray();
   res.send(docs);
 });
 
